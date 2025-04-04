@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农业资讯订阅 - 工业兴农网</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #f0fdf4, #dcfce7);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: #16a34a;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            color: #16a34a;
+        }
+
+        .site-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .site-description {
+            max-width: 36rem;
+            margin: 0 auto;
+            color: #4b5563;
+        }
+
+        /* Main content */
+        .main-content {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 64rem;
+            margin: 0 auto;
+        }
+
+        /* Banner */
+        .banner {
+            background: linear-gradient(to right, #16a34a, #22c55e);
+            padding: 2rem 1.5rem;
+            color: white;
+        }
+
+        .banner-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .banner-description {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        /* Content area */
+        .content-area {
+            padding: 1.5rem;
+        }
+
+        /* Subscription plans */
+        .subscription-plans {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .subscription-plans {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .plan-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .plan-card:hover {
+            border-color: #4ade80;
+        }
+
+        .plan-card.selected {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+
+        .plan-checkbox {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .plan-checkbox-inner {
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: #22c55e;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .plan-card.selected .plan-checkbox {
+            border-color: #22c55e;
+        }
+
+        .plan-card.selected .plan-checkbox-inner {
+            opacity: 1;
+        }
+
+        .plan-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: #dcfce7;
+            color: #166534;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f97316;
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .plan-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-icon {
+            color: #22c55e;
+            margin-top: 0.25rem;
+        }
+
+        .plan-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .price-period {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b7280;
+        }
+
+        .price-note {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Form section */
+        .form-section {
+            background-color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 6rem;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .checkbox-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-input {
+            width: 1rem;
+            height: 1rem;
+            accent-color: #22c55e;
+        }
+
+        .agreement-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .agreement-label {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .submit-button {
+            width: 100%;
+            background-color: #16a34a;
+            color: white;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-button:hover {
+            background-color: #15803d;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: #4b5563;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .social-link {
+            color: #4b5563;
+            transition: color 0.3s;
+        }
+
+        .social-link:hover {
+            color: #16a34a;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer-links {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+
+        .footer-link {
+            color: #4b5563;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: #16a34a;
+        }
+
+        .copyright {
+            margin-top: 1rem;
+        }
+
+        /* Utility classes */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-container">
+                <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a10 10 0 1 0 10 10 10 10 0 0 0-10-10z"></path>
+                    <path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                    <path d="M12 12v8"></path>
+                    <path d="M8 16h8"></path>
+                </svg>
+                <h1 class="site-title">工业兴农网</h1>
+            </div>
+            <p class="site-description">
+                订阅我们的农业资讯服务，获取最新的市场动态、技术指导和行业趋势，助力您的农业事业蓬勃发展。
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="main-content">
+                <!-- Banner -->
+                <div class="banner">
+                    <h2 class="banner-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                        </svg>
+                        选择您的订阅服务
+                    </h2>
+                    <p class="banner-description">根据您的需求选择合适的订阅计划，随时获取专业农业资讯</p>
+                </div>
+
+                <!-- Content Area -->
+                <div class="content-area">
+                    <!-- Subscription Plans -->
+                    <div class="subscription-plans">
+                        <!-- Basic Plan -->
+                        <div class="plan-card" data-plan="basic">
+                            <div class="plan-checkbox">
+                                <div class="plan-checkbox-inner"></div>
+                            </div>
+                            <div class="plan-badge">基础版</div>
+                            <h3 class="plan-title">基础农业资讯</h3>
+                            <ul class="plan-features">
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>每周价格行情汇总</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>气象预警通知</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>基础种植技术指导</span>
+                                </li>
+                            </ul>
+                            <div>
+                                <p class="plan-price">免费</p>
+                                <p class="price-note">永久免费使用</p>
+                            </div>
+                        </div>
+
+                        <!-- Pro Plan -->
+                        <div class="plan-card" data-plan="pro">
+                            <div class="popular-badge">最受欢迎</div>
+                            <div class="plan-checkbox">
+                                <div class="plan-checkbox-inner"></div>
+                            </div>
+                            <div class="plan-badge">专业版</div>
+                            <h3 class="plan-title">专业农业解决方案</h3>
+                            <ul class="plan-features">
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>每日市场分析报告</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>专家在线答疑（每周3次）</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>高级种植技术指导</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>农产品销售渠道推荐</span>
+                                </li>
+                            </ul>
+                            <div>
+                                <p class="plan-price">¥29<span class="price-period">/月</span></p>
+                                <p class="price-note">按年付费可享8折优惠</p>
+                            </div>
+                        </div>
+
+                        <!-- Enterprise Plan -->
+                        <div class="plan-card" data-plan="enterprise">
+                            <div class="plan-checkbox">
+                                <div class="plan-checkbox-inner"></div>
+                            </div>
+                            <div class="plan-badge">企业版</div>
+                            <h3 class="plan-title">企业定制服务</h3>
+                            <ul class="plan-features">
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>定制化市场分析报告</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>VIP专属客户经理</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>农业专家实地指导</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>优先获取新技术与设备</span>
+                                </li>
+                                <li class="plan-feature">
+                                    <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>
+                                    <span>农业政策解读与申请指导</span>
+                                </li>
+                            </ul>
+                            <div>
+                                <p class="plan-price">¥299<span class="price-period">/月</span></p>
+                                <p class="price-note">可根据需求定制服务内容</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Form -->
+                    <div class="form-section">
+                        <h3 class="form-title">完成订阅</h3>
+                        <form id="subscriptionForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">姓名</label>
+                                    <input type="text" id="name" class="form-input" placeholder="请输入您的姓名" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="form-label">邮箱地址</label>
+                                    <input type="email" id="email" class="form-input" placeholder="请输入您的邮箱地址" required>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="phone" class="form-label">手机号码</label>
+                                    <input type="tel" id="phone" class="form-input" placeholder="请输入您的手机号码">
+                                </div>
+                                <div class="form-group">
+                                    <label for="period" class="form-label">订阅周期</label>
+                                    <select id="period" class="form-select" required>
+                                        <option value="">请选择订阅周期</option>
+                                        <option value="monthly">每月</option>
+                                        <option value="quarterly">每季度</option>
+                                        <option value="yearly">每年</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">感兴趣的农业领域（可多选）</label>
+                                <div class="checkbox-grid">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" name="interests" value="crops">
+                                        <span>种植业</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" name="interests" value="livestock">
+                                        <span>畜牧业</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" name="interests" value="aquaculture">
+                                        <span>水产养殖</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="checkbox-input" name="interests" value="processing">
+                                        <span>农产品加工</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message" class="form-label">其他需求（选填）</label>
+                                <textarea id="message" class="form-textarea" placeholder="请描述您的其他需求或问题"></textarea>
+                            </div>
+
+                            <div class="agreement-checkbox">
+                                <input type="checkbox" id="agreement" class="checkbox-input" required>
+                                <label for="agreement" class="agreement-label">
+                                    我已阅读并同意<a href="#">服务条款</a>和<a href="#">隐私政策</a>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="submit-button">
+                                确认订阅
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12h14"></path>
+                                    <path d="m12 5 7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="social-links">
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                    </svg>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                    </svg>
+                </a>
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="#" class="social-link" aria-label="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect width="4" height="12" x="2" y="9"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                </a>
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">关于我们</a>
+                <a href="#" class="footer-link">联系方式</a>
+                <a href="#" class="footer-link">服务条款</a>
+                <a href="#" class="footer-link">隐私政策</a>
+                <a href="#" class="footer-link">常见问题</a>
+            </div>
+            <p class="copyright">© <span id="currentYear"></span> 工业兴农网. 保留所有权利.</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Set current year in copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Plan selection functionality
+        const planCards = document.querySelectorAll('.plan-card');
+        let selectedPlan = null;
+
+        planCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                planCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Store selected plan
+                selectedPlan = this.getAttribute('data-plan');
+            });
+        });
+
+        // Form submission
+        const form = document.getElementById('subscriptionForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate if a plan is selected
+            if (!selectedPlan) {
+                alert('请选择一个订阅计划');
+                return;
+            }
+            
+            // Get form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const period = document.getElementById('period').value;
+            
+            // Get selected interests
+            const interests = Array.from(document.querySelectorAll('input[name="interests"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            // Get message
+            const message = document.getElementById('message').value;
+            
+            // Get plan details
+            const planTitle = document.querySelector(`.plan-card[data-plan="${selectedPlan}"] .plan-title`).textContent;
+            
+            // In a real application, you would send this data to your server
+            console.log({
+                plan: selectedPlan,
+                planTitle,
+                name,
+                email,
+                phone,
+                period,
+                interests,
+                message
+            });
+            
+            // Show success message
+            alert(`订阅成功！我们将定期发送${planTitle}到您的邮箱: ${email}`);
+            
+            // Optional: reset form
+            form.reset();
+            planCards.forEach(c => c.classList.remove('selected'));
+            selectedPlan = null;
+        });
+    </script>
+</body>
+</html>

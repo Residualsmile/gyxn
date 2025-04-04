@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能农机助手  -  工业兴农网</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #11e253;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quick-question {
+            padding: 10px 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .quick-question:hover {
+            background: #e9f7e9;
+            color: #4CAF50;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #e9f7e9;
+            color: #4CAF50;
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .message-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .message-time {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .message-time span {
+            background: #f5f5f5;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin: 8px 0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            max-width: 80%;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: #4CAF50;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+
+        .bot-message {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .user-avatar {
+            right: -45px;
+        }
+
+        .bot-avatar {
+            left: -45px;
+        }
+
+        .message-content {
+            line-height: 1.5;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-reply {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-reply:hover {
+            background: #e9f7e9;
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .typing-indicator {
+            display: flex;
+            padding: 12px 16px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            width: fit-content;
+            margin-top: 8px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.5s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.3s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .input-box {
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-actions {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .input-action {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin-right: 5px;
+        }
+
+        .input-action:hover {
+            background: #e9f7e9;
+            color: #4CAF50;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .send-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #3d9140;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #a5d6a7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .file-preview i {
+            margin-right: 8px;
+            color: #4CAF50;
+        }
+
+        .file-preview button {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+        }
+
+        .attachment {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .doc-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .doc-link:hover {
+            background: #3d9140;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: flex-end;
+        }
+
+        .feedback-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .feedback-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                flex-direction: row;
+                overflow: hidden;
+            }
+
+            .sidebar.expanded {
+                height: 300px;
+            }
+
+            .sidebar-header {
+                padding: 10px;
+                width: 100%;
+            }
+
+            .sidebar-content, .sidebar-footer {
+                display: none;
+            }
+
+            .sidebar.expanded .sidebar-content,
+            .sidebar.expanded .sidebar-footer {
+                display: block;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .message-avatar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .user-avatar {
+                right: -35px;
+            }
+
+            .bot-avatar {
+                left: -35px;
+            }
+        }
+
+        /* 移动端菜单按钮 */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        /* 文件上传样式 */
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTYgMThhNCA0IDAgMCAxLTggMCIvPjxwYXRoIGQ9Ik0xMi45IDE4YTEgMSAwIDEgMS0xLjggMCIvPjxwYXRoIGQ9Ik0xNyA3YTUgNSAwIDAgMC0xMCAwIi8+PHBhdGggZD0iTTEyIDJhMSAxIDAgMCAxIDEgMXYyYTEgMSAwIDAgMS0yIDBWM2ExIDEgMCAwIDEgMS0xWiIvPjxwYXRoIGQ9Ik0xNyA3djEwIi8+PHBhdGggZD0iTTcgN3YxMCIvPjwvc3ZnPg==" alt="Logo">
+                <div>
+                    <h1>智能农机助手</h1>
+                    <p>工业兴农网</p>
+                </div>
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <div class="category">
+                    <div class="category-title">常见问题</div>
+                    <div class="quick-question" onclick="setInput('如何调整拖拉机液压系统？')">
+                        <i class="fas fa-tractor"></i> 如何调整拖拉机液压系统？
+                    </div>
+                    <div class="quick-question" onclick="setInput('收割机故障代码E-45是什么意思？')">
+                        <i class="fas fa-exclamation-triangle"></i> 收割机故障代码E-45是什么意思？
+                    </div>
+                    <div class="quick-question" onclick="setInput('附近有哪些农机维修点？')">
+                        <i class="fas fa-map-marker-alt"></i> 附近有哪些农机维修点？
+                    </div>
+                    <div class="quick-question" onclick="setInput('农机购置补贴政策有哪些？')">
+                        <i class="fas fa-money-bill-wave"></i> 农机购置补贴政策有哪些？
+                    </div>
+                </div>
+                <div class="category">
+                    <div class="category-title">农机分类</div>
+                    <div class="quick-question" onclick="setInput('拖拉机使用指南')">
+                        <i class="fas fa-tractor"></i> 拖拉机
+                    </div>
+                    <div class="quick-question" onclick="setInput('收割机使用指南')">
+                        <i class="fas fa-truck-monster"></i> 收割机
+                    </div>
+                    <div class="quick-question" onclick="setInput('播种机使用指南')">
+                        <i class="fas fa-seedling"></i> 播种机
+                    </div>
+                    <div class="quick-question" onclick="setInput('旋耕机使用指南')">
+                        <i class="fas fa-cogs"></i> 旋耕机
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                © 2024 工业兴农网 - 智能农机助手 v2.5.0
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <i class="fas fa-robot"></i> 农机助手小兴
+                </div>
+                <div class="chat-actions">
+                    <button class="action-btn" title="搜索对话">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="action-btn" title="清空对话">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="action-btn" title="设置">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chat-history" id="chatHistory">
+                <div class="message-group">
+                    <div class="message-time">
+                        <span>今天 10:30</span>
+                    </div>
+                    <div class="message bot-message">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0Q0FGNTAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTYgMThhNCA0IDAgMCAxLTggMCIvPjxwYXRoIGQ9Ik0xMi45IDE4YTEgMSAwIDEgMS0xLjggMCIvPjxwYXRoIGQ9Ik0xNyA3YTUgNSAwIDAgMC0xMCAwIi8+PHBhdGggZD0iTTEyIDJhMSAxIDAgMCAxIDEgMXYyYTEgMSAwIDAgMS0yIDBWM2ExIDEgMCAwIDEgMS0xWiIvPjxwYXRoIGQ9Ik0xNyA3djEwIi8+PHBhdGggZD0iTTcgN3YxMCIvPjwvc3ZnPg==" alt="Bot" class="message-avatar bot-avatar">
+                        <div class="message-content">
+                            🚜 您好！我是农机助手小兴，可以为您解答以下问题：
+                            <br>1. 农机操作指南
+                            <br>2. 故障代码查询
+                            <br>3. 附近维修点
+                            <br>4. 政策补贴咨询
+                        </div>
+                        <div class="quick-replies">
+                            <div class="quick-reply" onclick="setInput('农机操作指南')">农机操作指南</div>
+                            <div class="quick-reply" onclick="setInput('故障代码查询')">故障代码查询</div>
+                            <div class="quick-reply" onclick="setInput('附近维修点')">附近维修点</div>
+                            <div class="quick-reply" onclick="setInput('政策补贴咨询')">政策补贴咨询</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-box">
+                <div class="input-actions">
+                    <button class="input-action" title="上传图片" onclick="triggerFileUpload()">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="input-action" title="上传文件">
+                        <i class="fas fa-file"></i>
+                    </button>
+                    <button class="input-action" title="语音输入">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)">
+                </div>
+                <div id="file-preview-container"></div>
+                <div class="input-container">
+                    <input type="text" id="user-input" placeholder="输入您的问题..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let isTyping = false;
+        let selectedFile = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 移动端菜单切换
+            document.getElementById('menuToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('expanded');
+            });
+
+            // 禁用发送按钮（如果输入为空）
+            updateSendButton();
+        });
+
+        // 设置输入框内容
+        function setInput(text) {
+            document.getElementById('user-input').value = text;
+            updateSendButton();
+            // 在移动设备上关闭侧边栏
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('expanded');
+            }
+            // 聚焦输入框
+            document.getElementById('user-input').focus();
+        }
+
+        // 处理键盘按键事件
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+            updateSendButton();
+        }
+
+        // 更新发送按钮状态
+        function updateSendButton() {
+            const input = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            
+            if (input.value.trim() === '' && !selectedFile && !isTyping) {
+                sendBtn.disabled = true;
+            } else {
+                sendBtn.disabled = false;
+            }
+        }
+
+        // 触发文件上传
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+
+        // 处理文件上传
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            selectedFile = file;
+            updateSendButton();
+            
+            // 显示文件预览
+            const previewContainer = document.getElementById('file-preview-container');
+            previewContainer.innerHTML = `
+                <div class="file-preview">
+                    <i class="fas fa-image"></i>
+                    <span>${file.name}</span>
+                    <button onclick="removeFile()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        // 移除已选文件
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-preview-container').innerHTML = '';
+            updateSendButton();
+        }
+
+        // 获取当前时间
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // 添加时间戳
+        function addTimeStamp() {
+            const history = document.getElementById('chatHistory');
+            const timeStamp = document.createElement('div');
+            timeStamp.className = 'message-time';
+            timeStamp.innerHTML = `<span>今天 ${getCurrentTime()}</span>`;
+            history.appendChild(timeStamp);
+        }
+
+        // 添加消息组
+        function addMessageGroup() {
+            const history = document.getElementById('chatHistory');
+            const messageGroup = document.createElement('div');
+            messageGroup.className = 'message-group';
+            history.appendChild(messageGroup);
+            return messageGroup;
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const userMessage = input.value.trim();
+            
+            // 如果没有输入且没有文件，则不发送
+            if (userMessage === '' && !selectedFile) return;
+            
+            // 禁用发送按钮，防止重复发送
+            document.getElementById('send-btn').disabled = true;
+            
+            // 创建新的消息组
+            const messageGroup = addMessageGroup();
+            
+            // 用户消息
+            const userMessageElement = document.createElement('div');
+            userMessageElement.className = 'message user-message';
+            userMessageElement.innerHTML = `
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgMjFhMiAyIDAgMCAxLTIgMmgtMTJhMiAyIDAgMCAxLTItMlY4YTIgMiAwIDAgMSAyLTJoMTJhMiAyIDAgMCAxIDIgMnYxMyIvPjxwYXRoIGQ9Ik0xNiA4VjZhMiAyIDAgMCAwLTItMmgtNGEyIDIgMCAwIDAtMiAydjIiLz48cGF0aCBkPSJNMTIgMTJhMiAyIDAgMSAwIDAgNCAyIDIgMCAxIDAgMC00eiIvPjwvc3ZnPg==" alt="User" class="message-avatar user-avatar">
+                <div class="message-content">
+                    ${userMessage}
+                    ${selectedFile ? `<div class="attachment"><i class="fas fa-paperclip"></i> ${selectedFile.name}</div>` : ''}
+                </div>
+            `;
+            messageGroup.appendChild(userMessageElement);
+            
+            // 清空输入框和文件
+            input.value = '';
+            if (selectedFile) {
+                removeFile();
+            }
+            
+            // 滚动到底部
+            scrollToBottom();
+            
+            // 显示正在输入指示器
+            isTyping = true;
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            messageGroup.appendChild(typingIndicator);
+            
+            // 模拟AI回复
+            setTimeout(() => {
+                // 移除输入指示器
+                messageGroup.removeChild(typingIndicator);
+                
+                // 生成回复内容
+                const botResponse = generateResponse(userMessage);
+                
+                // 添加机器人消息
+                const botMessageElement = document.createElement('div');
+                botMessageElement.className = 'message bot-message';
+                botMessageElement.innerHTML = `
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0Q0<Thinking>
+I need to continue the HTML code that was cut off. The cut-off point is in the middle of what appears to be a base64-encoded SVG image for the bot avatar. I'll continue from this exact point and complete the rest of the HTML file for the AI customer service interface.
+
+The cut-off happened in the middle of an SVG data URL in the bot message element's HTML. I'll continue with the rest of the base64 encoding and then complete the bot message HTML, followed by the remaining JavaScript functions and any other HTML elements needed to complete the file.
+</Thinking>
+
+vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0Q0FGNTAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTYgMThhNCA0IDAgMCAxLTggMCIvPjxwYXRoIGQ9Ik0xMi45IDE4YTEgMSAwIDEgMS0xLjggMCIvPjxwYXRoIGQ9Ik0xNyA3YTUgNSAwIDAgMC0xMCAwIi8+PHBhdGggZD0iTTEyIDJhMSAxIDAgMCAxIDEgMXYyYTEgMSAwIDAgMS0yIDBWM2ExIDEgMCAwIDEgMS0xWiIvPjxwYXRoIGQ9Ik0xNyA3djEwIi8+PHBhdGggZD0iTTcgN3YxMCIvPjwvc3ZnPg==" alt="Bot" class="message-avatar bot-avatar">
+                    <div class="message-content">
+                        ${botResponse.content}
+                    </div>
+                    ${botResponse.quickReplies ? `
+                    <div class="quick-replies">
+                        ${botResponse.quickReplies.map(reply => `
+                            <div class="quick-reply" onclick="setInput('${reply}')">${reply}</div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn" title="有帮助">
+                            <i class="fas fa-thumbs-up"></i>
+                        </button>
+                        <button class="feedback-btn" title="没帮助">
+                            <i class="fas fa-thumbs-down"></i>
+                        </button>
+                    </div>
+                `;
+                messageGroup.appendChild(botMessageElement);
+                
+                // 滚动到底部
+                scrollToBottom();
+                
+                // 重置状态
+                isTyping = false;
+                updateSendButton();
+            }, 1500);
+        }
+
+        // 生成回复内容
+        function generateResponse(query) {
+            // 简单的响应生成逻辑
+            if (!query || query === '') {
+                return {
+                    content: "请问有什么可以帮助您的？",
+                    quickReplies: ["农机操作指南", "故障代码查询", "附近维修点", "政策补贴咨询"]
+                };
+            }
+            
+            if (query.includes('操作') || query.includes('使用') || query.includes('指南')) {
+                return {
+                    content: `✅ 已收到您关于"${query}"的咨询。<br><br>建议您查看《农机操作手册》第3章，其中详细介绍了正确的操作步骤和注意事项。<br><br>您还可以观看我们的视频教程获取直观指导。<br><button class="doc-link">查看操作手册</button>`,
+                    quickReplies: ["查看视频教程", "常见操作问题", "安全注意事项"]
+                };
+            } else if (query.includes('故障') || query.includes('错误') || query.includes('代码')) {
+                return {
+                    content: `✅ 已收到您关于"${query}"的咨询。<br><br>根据您描述的情况，可能是传感器故障或液压系统问题。故障代码E-45通常表示油压不足。<br><br>建议检查：<br>1. 液压油位<br>2. 油管是否堵塞<br>3. 传感器连接是否正常<br><button class="doc-link">查看故障手册</button>`,
+                    quickReplies: ["联系技术支持", "附近维修点", "其他故障代码"]
+                };
+            } else if (query.includes('维修') || query.includes('修理') || query.includes('维修点')) {
+                return {
+                    content: `✅ 已收到您关于"${query}"的咨询。<br><br>根据您的位置信息，为您找到3家附近的授权维修点：<br><br>1. 农机技术服务中心（距离2.5公里）<br>2. 兴农机械维修站（距离4.1公里）<br>3. 绿丰农机专修（距离5.7公里）<br><br>需要导航到这些地点吗？<br><button class="doc-link">查看地图</button>`,
+                    quickReplies: ["导航到最近维修点", "联系维修点", "预约上门维修"]
+                };
+            } else if (query.includes('补贴') || query.includes('政策')) {
+                return {
+                    content: `✅ 已收到您关于"${query}"的咨询。<br><br>2024年农机购置补贴政策已更新：<br><br>1. 大型拖拉机补贴比例提高至30%<br>2. 智能农机额外补贴5%<br>3. 申请流程简化，可在线提交<br><br>您需要准备的材料：身份证、购机发票、银行账户信息。申请截止日期为2024年10月31日。<br><button class="doc-link">查看详细政策</button>`,
+                    quickReplies: ["补贴申请流程", "补贴计算器", "政策咨询热线"]
+                };
+            } else {
+                return {
+                    content: `✅ 已收到您的咨询："${query}"<br><br>我们的技术团队正在分析您的问题，将为您提供最专业的解答。<br><br>您可以尝试提供更多细节，如农机型号、使用环境等，以便我们更准确地回答您的问题。`,
+                    quickReplies: ["提供更多信息", "查看相关问题", "联系人工客服"]
+                };
+            }
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            const chatHistory = document.getElementById('chatHistory');
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // 监听输入框变化
+        document.getElementById('user-input').addEventListener('input', function() {
+            updateSendButton();
+        });
+    </script>
+</body>
+</html>
